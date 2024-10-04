@@ -22,4 +22,7 @@ Rails.application.routes.draw do
   get '/stock/prices/:symbols', to: 'stocks#price_by_symbols'
   post '/stock/sync', to: 'stocks#sync_stock_prices'
 
+  # wallet routes
+  get '/wallet/balances', to: 'wallet#balances'
+
 end

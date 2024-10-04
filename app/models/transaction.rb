@@ -48,7 +48,6 @@ class Transaction < ApplicationRecord
     end
   end
 
-
   # Apply the transaction logic (debit or credit)
   def apply_transaction
     ActiveRecord::Base.transaction do
