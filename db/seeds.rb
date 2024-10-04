@@ -23,8 +23,8 @@ team1 = Team.create!(name: 'Alpha Team', description: 'First test team')
 team2 = Team.create!(name: 'Beta Team', description: 'Second test team')
 
 # Create Stocks
-stock1 = Stock.create!(ticker: 'AAPL', price: 150.25)
-stock2 = Stock.create!(ticker: 'TSLA', price: 700.00)
+stock1 = Stock.create!(symbol: 'AAPL', price: 150.25)
+stock2 = Stock.create!(symbol: 'TSLA', price: 700.00)
 
 # Create Wallets for Users
 wallet1 = Wallet.create!(user: user1, balance: 1000.0)

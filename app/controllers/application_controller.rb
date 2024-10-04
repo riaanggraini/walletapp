@@ -1,5 +1,5 @@
-require Rails.root.join('lib/helpers/response_helper.rb')
-require Rails.root.join('lib/helpers/response_messages.rb')
+require 'helpers/response_helper'
+require 'helpers/response_messages'
 
 class ApplicationController < ActionController::API
   include ResponseHelper

@@ -7,9 +7,17 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # sessions routes
   post '/login', to: 'sessions#create'
 
-  # create transactions
+  # transactions routes
   post '/transactions', to: 'transactions#create'
+
+  # stock routes
+  get '/stock/price/all', to: 'stocks#all_price'
+  get '/stock/price/:symbol', to: 'stocks#price_by_symbol'
+  get '/stock/prices/:symbols', to: 'stocks#price_by_symbols'
+  post '/stock/prices/:symbols', to: 'stocks#sync_stock_prices'
 
 end

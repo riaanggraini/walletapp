@@ -10,15 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_02_131520) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_04_144253) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "stocks", force: :cascade do |t|
-    t.string "ticker", null: false
+    t.string "symbol", null: false
     t.decimal "price", precision: 15, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "change", precision: 15, scale: 2
+    t.decimal "day_high", precision: 15, scale: 2
+    t.decimal "day_low", precision: 15, scale: 2
+    t.string "last_update_time"
+    t.string "company_name"
+    t.string "industry"
+    t.string "isin"
+    t.decimal "open_price", precision: 15, scale: 2
+    t.decimal "p_change", precision: 5, scale: 2
+    t.decimal "per_change_30d", precision: 5, scale: 2
+    t.decimal "per_change_365d", precision: 5, scale: 2
+    t.decimal "previous_close", precision: 15, scale: 2
+    t.decimal "total_traded_value", precision: 20, scale: 2
+    t.integer "total_traded_volume"
+    t.decimal "year_high", precision: 15, scale: 2
+    t.decimal "year_low", precision: 15, scale: 2
+    t.index ["symbol"], name: "index_stocks_on_symbol", unique: true
   end
 
   create_table "teams", force: :cascade do |t|

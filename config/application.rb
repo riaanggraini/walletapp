@@ -8,7 +8,8 @@ Bundler.require(*Rails.groups)
 
 module Walletapps
   class Application < Rails::Application
-    config.autoload_paths += %W(#{config.root}/lib)
+    
+    config.autoload_paths << Rails.root.join('lib')
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.2
 

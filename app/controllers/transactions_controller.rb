@@ -1,4 +1,4 @@
-require Rails.root.join('lib/helpers/authentication_helper.rb')
+require 'helpers/authentication_helper'
 
 class TransactionsController < ApplicationController
   include AuthenticationHelper
