@@ -23,15 +23,26 @@ class TransactionsController < ApplicationController
     end
 
     # Call the service to create the transaction
-    service = TransactionService.new(@current_user, transaction_params)
-    result = service.create_transaction
+    service = TransactionService.new(@current_user)
+    result = service.create_transaction(transaction_params)
 
     json_response(status: result[:status], message: result[:message], data: result[:data])
+  end
+
+  def history
+    service = TransactionService.new(@current_user)
+    result = service.get_transaction_history(params)
+    json_response(
+      status: result[:status],
+      message: result[:message],
+      data: result[:data],
+      pagination: result[:pagination]
+    )
   end
 
   private
 
   def transaction_params
-    params.require(:transaction).permit(:target_wallet_id, :amount, :transaction_type)
+    params.require(:transaction).permit(:target_wallet_id, :amount)
   end
 end

@@ -12,7 +12,8 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create'
 
   # transactions routes
-  post '/transfer', to: 'transactions#transfer'
+  post '/transaction/create', to: 'transactions#transfer'
+  get '/transactions/history', to: 'transactions#history'
 
   # stock routes
   get '/stock/price/all', to: 'stocks#all_price'

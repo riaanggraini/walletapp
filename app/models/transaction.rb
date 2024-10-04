@@ -1,7 +1,7 @@
 class Transaction < ApplicationRecord
   # Associations
   belongs_to :source_wallet, class_name: 'Wallet', foreign_key: 'source_wallet_id'
-  belongs_to :target_wallet, class_name: 'Wallet', foreign_key: 'target_wallet_id', optional: true
+  belongs_to :target_wallet, class_name: 'Wallet', foreign_key: 'target_wallet_id'
 
   # Enum for transaction types
   enum transaction_type: { debit: 'debit', credit: 'credit' }
@@ -35,18 +35,15 @@ class Transaction < ApplicationRecord
 
   # Ensure target user has active status
   def target_user_is_active
-    if target_wallet.user.status != 'active'
+    if target_wallet.user && target_wallet.user.status != 'active'
       errors.add(:target_wallet, ResponseMessages.user_cant_accept_fund("#{target_wallet.user.status}"))
+    elsif target_wallet.user.nil?
+      errors.add(:target_wallet, "No user is associated with the target wallet")
     end
   end
 
-  # Helper method to check if a wallet belongs to a user
-  def wallet_belongs_to_user?(wallet)
-    wallet.user.present? && wallet.team.nil? && wallet.stock.nil?
-  end
-
   def source_user_is_active
-    if source_wallet.user.status != 'active'
+    if source_wallet.user && source_wallet.user.status != 'active'
       errors.add(:source_wallet, ResponseMessages.user_cant_send_fund("#{source_wallet.user.status}"))
     end
   end
