@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   # transactions routes
   post '/transaction/create', to: 'transactions#transfer'
   get '/transactions/history', to: 'transactions#history'
+  get '/transactions/history/:id', to: 'transactions#detail'
 
   # stock routes
   get '/stock/price/all', to: 'stocks#all_price'

@@ -48,4 +48,16 @@ class TransactionService
       { status: :not_found, message: ResponseMessages.not_found("Transactions") }
     end
   end
+  
+  def get_transaction_detail(params)
+    transaction = Transaction.includes(:source_wallet, target_wallet: :user).find_by(id: params[:id])
+  
+    if transaction
+      transaction_data = TransactionDecorator.new(transaction).as_json
+  
+      { status: :ok, message: ResponseMessages.found("Transaction detail"), data: transaction_data }
+    else
+      { status: :not_found, message: ResponseMessages.not_found("Transaction detail") }
+    end
+  end
 end

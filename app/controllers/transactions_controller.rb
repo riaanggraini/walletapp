@@ -40,6 +40,16 @@ class TransactionsController < ApplicationController
     )
   end
 
+  def detail
+    service = TransactionService.new(@current_user)
+    result = service.get_transaction_detail(params)
+    json_response(
+      status: result[:status],
+      message: result[:message],
+      data: result[:data],
+    )
+  end
+
   private
 
   def transaction_params
