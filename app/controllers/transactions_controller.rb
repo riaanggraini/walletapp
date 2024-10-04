@@ -2,45 +2,31 @@ require 'helpers/authentication_helper'
 
 class TransactionsController < ApplicationController
   include AuthenticationHelper
+  include ResponseMessages
 
-  # Authentication Helpers
   before_action :authenticate_user
 
-  def create
+  def transfer
     # Validate required parameters
     if transaction_params[:target_wallet_id].blank?
       return json_response(status: :bad_request, message: ResponseMessages.missing_value("Target wallet ID"))
     end
-    
+
     if transaction_params[:amount].blank?
       return json_response(status: :bad_request, message: ResponseMessages.missing_value("Amount"))
     end
-    
-    if transaction_params[:transaction_type].blank?
-      return json_response(status: :bad_request, message: ResponseMessages.missing_value("Transaction type"))
-    end    
 
-    # Find source and target wallets
-    source_wallet = @current_user.wallet
+    # Check if the target wallet exists
     target_wallet = Wallet.find_by(id: transaction_params[:target_wallet_id])
-
     if target_wallet.nil?
       return json_response(status: :not_found, message: ResponseMessages.not_found("Target Wallet"))
     end
 
-    # Create transaction
-    transaction = Transaction.new(
-      source_wallet: source_wallet,
-      target_wallet: target_wallet,
-      amount: transaction_params[:amount],
-      transaction_type: transaction_params[:transaction_type]
-    )
+    # Call the service to create the transaction
+    service = TransactionService.new(@current_user, transaction_params)
+    result = service.create_transaction
 
-    if transaction.save
-      json_response(status: :created, message: ResponseMessages.created("Transaction"), data: { transaction: transaction })
-    else
-      json_response(status: :unprocessable_entity, message: transaction.errors.full_messages.first)
-    end
+    json_response(status: result[:status], message: result[:message], data: result[:data])
   end
 
   private

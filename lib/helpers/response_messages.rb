@@ -5,6 +5,7 @@ module ResponseMessages
   UNAUTHORIZED_USER_NOT_FOUND = "Unauthorized - User not found".freeze
   UNAUTHORIZED_INVALID_TOKEN = "Unauthorized - Invalid or missing token".freeze
   INSUFFICIENT_BALANCE_SOURCE = "Insufficient balance in the source wallet".freeze
+  WALLET_MUST_BELONG_TO_USER = "Target wallet must belong to user".freeze
 
   def self.created(field)
     "#{field} successfuly created"
@@ -32,5 +33,9 @@ module ResponseMessages
 
   def self.stock_not_found(field)
     "Stock with symbol #{field} Not Found"
+  end
+
+  def self.user_cant_accept_fund(field)
+    "Target user's account is #{field}. Cannot receive funds."
   end
 end

@@ -11,6 +11,8 @@ class Transaction < ApplicationRecord
   validates :transaction_type, presence: true, inclusion: { in: %w[debit credit], message: ResponseMessages.not_found('Transaction type') }
   validate :sufficient_balance_in_source_wallet, if: :debit?
   validate :source_wallet_required_for_debit, if: :debit?
+  validate :source_user_is_active, if: -> { source_wallet.present? }
+  validate :target_user_is_active, if: -> { target_wallet.present? }
 
   # Callbacks
   after_create :apply_transaction
@@ -31,14 +33,26 @@ class Transaction < ApplicationRecord
     end
   end
 
-  # Ensure target wallet exists
-  def target_wallet_exists
-    if target_wallet.nil?
-      errors.add(:target_wallet, ResponseMessages.not_found('Target wallet'))
+  # Ensure target user has active status
+  def target_user_is_active
+    if target_wallet.user.status != 'active'
+      errors.add(:target_wallet, ResponseMessages.user_cant_accept_fund("#{target_wallet.user.status}"))
     end
   end
 
-  # Apply transaction
+  # Helper method to check if a wallet belongs to a user
+  def wallet_belongs_to_user?(wallet)
+    wallet.user.present? && wallet.team.nil? && wallet.stock.nil?
+  end
+
+  def source_user_is_active
+    if source_wallet.user.status != 'active'
+      errors.add(:source_wallet, ResponseMessages.user_cant_send_fund("#{source_wallet.user.status}"))
+    end
+  end
+
+
+  # Apply the transaction logic (debit or credit)
   def apply_transaction
     ActiveRecord::Base.transaction do
       # Lock both wallets
@@ -51,7 +65,7 @@ class Transaction < ApplicationRecord
             target_wallet.adjust_balance(amount)
           end
 
-          # If something fails, rollback
+          # Rollback if saving fails
           raise ActiveRecord::Rollback unless source_wallet.save && (target_wallet.nil? || target_wallet.save)
         end
       end

@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create'
 
   # transactions routes
-  post '/transactions', to: 'transactions#create'
+  post '/transfer', to: 'transactions#transfer'
 
   # stock routes
   get '/stock/price/all', to: 'stocks#all_price'
