@@ -18,6 +18,6 @@ Rails.application.routes.draw do
   get '/stock/price/all', to: 'stocks#all_price'
   get '/stock/price/:symbol', to: 'stocks#price_by_symbol'
   get '/stock/prices/:symbols', to: 'stocks#price_by_symbols'
-  post '/stock/prices/:symbols', to: 'stocks#sync_stock_prices'
+  post '/stock/sync', to: 'stocks#sync_stock_prices'
 
 end

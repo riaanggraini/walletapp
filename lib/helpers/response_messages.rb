@@ -10,6 +10,10 @@ module ResponseMessages
     "#{field} successfuly created"
   end
 
+  def self.updated(field)
+    "#{field} successfuly updated"
+  end
+
   def self.missing_value(field)
     "#{field} is missing"
   end
@@ -20,5 +24,13 @@ module ResponseMessages
 
   def self.not_found(field)
     "#{field} Not Found"
+  end
+
+  def self.found(field)
+    "#{field} Found"
+  end
+
+  def self.stock_not_found(field)
+    "Stock with symbol #{field} Not Found"
   end
 end
