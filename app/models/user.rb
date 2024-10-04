@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   # Associations
-  has_many :wallets, dependent: :restrict_with_error
+  has_one :wallet, dependent: :destroy
   has_many :transactions, dependent: :restrict_with_error
 
   # Virtual attribute for the password

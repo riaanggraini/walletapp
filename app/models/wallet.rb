@@ -11,8 +11,14 @@ class Wallet < ApplicationRecord
   # Validations
   validates :balance, numericality: { greater_than_or_equal_to: 0 }
 
-  # accosiation validations
+  # Association validation to ensure only one entity is linked
   validate :only_one_association
+
+  # Method to adjust balance
+  def adjust_balance(amount)
+    self.balance += amount
+    save!
+  end
 
   private
 
