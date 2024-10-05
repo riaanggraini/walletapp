@@ -1,4 +1,4 @@
-# Project Name
+# Wallet APP with Ruby On Rails
 
 **Project Name** is a Ruby on Rails application designed to [brief description of what your project does]. This project [explain why this project exists or what problems it solves].
 
