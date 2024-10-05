@@ -1,0 +1,985 @@
+openapi: 3.0.1
+info:
+  title: Wallets API
+  description: API for managing wallets and transactions
+  version: "1.0.0"
+
+components:
+  securitySchemes:
+    DirectTokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization 
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate a user with email and password and return a JWT token on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: User's email
+                  example: "john@example.com"
+                password:
+                  type: string
+                  description: User's password
+                  example: "password123"
+      responses:
+        "200":
+          description: Login successful, returns a token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request
+                    example: "success"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Login successful"
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        description: The JWT token for authentication
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "400":
+          description: Missing or invalid email/password.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Missing email or password"
+        "401":
+          description: Invalid login credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Invalid email or password"
+  
+  /wallet/balances:
+    get:
+      tags:
+        - Wallet
+      summary: Retrieve wallet balance
+      description: Returns the balance of the user's wallet.
+      security:
+        - DirectTokenAuth: [] 
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: The Authorization token (without "Bearer" prefix).
+          schema:
+            type: string
+            example: eyJ1c2VyX2lkIjoxLCJleHAiOjE3MjgwNjQ0OTMsIm5vbmNlIjoiZjVjYjk4Zjk5MDlkZDNmZTI2YTVhNzgwNjczYjUwMGJmOGZjN2Y0MGU0ZjI4MzIzN2FkYzE4MjI3ZWEyYzE2NSJ9.41559947be4702aabe809921bddb3ab64e6df87131a2c87863788b2f900b7689
+      responses:
+        "200":
+          description: Successfully retrieved the wallet balance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Balance Found"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: The wallet ID.
+                        example: 1
+                      user_id:
+                        type: integer
+                        description: The ID of the user.
+                        example: 1
+                      team_id:
+                        type: integer
+                        description: The team ID associated with the wallet.
+                        nullable: true
+                        example: null
+                      stock_id:
+                        type: integer
+                        description: The stock ID associated with the wallet.
+                        nullable: true
+                        example: null
+                      balance:
+                        type: string
+                        description: The current balance of the wallet.
+                        example: "1340.0"
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: The timestamp when the wallet was created.
+                        example: "2024-10-02T15:13:02.013Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        description: The timestamp when the wallet was last updated.
+                        example: "2024-10-04T16:13:03.101Z"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+  
+  /transaction/create:
+    post:
+      tags:
+        - Transactions
+      summary: Create a new transaction
+      description: Send money from one user to another by creating a transaction.
+      security:
+        - DirectTokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction:
+                  type: object
+                  properties:
+                    target_wallet_id:
+                      type: integer
+                      description: The ID of the target user's wallet.
+                      example: 2
+                    amount:
+                      type: number
+                      format: float
+                      description: The amount of money to be sent.
+                      example: 10
+      responses:
+        "201":
+          description: Transaction successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "created"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Transaction successfuly created"
+                  data:
+                    type: object
+                    properties:
+                      transaction:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            description: The ID of the transaction.
+                            example: 32
+                          source_wallet_id:
+                            type: integer
+                            description: The ID of the sender's wallet.
+                            example: 1
+                          target_wallet_id:
+                            type: integer
+                            description: The ID of the recipient's wallet.
+                            example: 2
+                          amount:
+                            type: string
+                            description: The amount transferred.
+                            example: "10.0"
+                          transaction_type:
+                            type: string
+                            description: The type of the transaction.
+                            example: "debit"
+                          created_at:
+                            type: string
+                            format: date-time
+                            description: The timestamp when the transaction was created.
+                            example: "2024-10-04T16:13:03.097Z"
+                          updated_at:
+                            type: string
+                            format: date-time
+                            description: The timestamp when the transaction was last updated.
+                            example: "2024-10-04T16:13:03.097Z"
+        "400":
+          description: Bad request. Invalid data or missing fields.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid transaction data"
+        "401":
+          description: Unauthorized. Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+  /transactions/history:
+    get:
+      tags:
+        - Transactions
+      summary: Retrieve transaction history
+      description: Retrieves the transaction history for the user's wallet, with pagination.
+      security:
+        - DirectTokenAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: true
+          description: The page number for pagination.
+          schema:
+            type: integer
+            example: 1
+        - name: size
+          in: query
+          required: true
+          description: The number of transactions per page.
+          schema:
+            type: integer
+            example: 10
+        - name: Authorization
+          in: header
+          required: true
+          description: The Authorization token (without "Bearer" prefix).
+          schema:
+            type: string
+            example: eyJ1c2VyX2lkIjoxLCJleHAiOjE3MjgwNjA4NDEsIm5vbmNlIjoiOTJkNzYyOWY3ZjllY2FhNTY3ZDkzNDA1NzY2NTkyYmUxZmEyNDBkZTgwYjJmNGY5Y2JkY2Y3ZGVkNWE3MmVlNiJ9.62035772193fea6f871672d6944512ce56f49cbab273286f4759b85403b3e311
+      responses:
+        "200":
+          description: Successfully retrieved the transaction history.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Transactions Found"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: The ID of the transaction.
+                          example: 32
+                        amount:
+                          type: string
+                          description: The amount of the transaction.
+                          example: "-10.0"
+                        transaction_type:
+                          type: string
+                          description: The type of the transaction (debit/credit).
+                          example: "debit"
+                        source_wallet_id:
+                          type: integer
+                          description: The ID of the source wallet.
+                          example: 1
+                        target_wallet_id:
+                          type: integer
+                          description: The ID of the target wallet.
+                          example: 2
+                        target_wallet_owner_name:
+                          type: string
+                          description: The name of the target wallet owner.
+                          example: "jane_smith"
+                        target_wallet_owner_email:
+                          type: string
+                          description: The email of the target wallet owner.
+                          example: "jane@example.com"
+                        created_at:
+                          type: string
+                          format: date-time
+                          description: The timestamp when the transaction was created.
+                          example: "2024-10-04T16:13:03.097Z"
+                  pagination:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        description: The current page of the transaction history.
+                        example: 1
+                      next_page:
+                        type: integer
+                        description: The next page of the transaction history.
+                        example: 2
+                      prev_page:
+                        type: integer
+                        description: The previous page of the transaction history.
+                        nullable: true
+                        example: null
+                      total_pages:
+                        type: integer
+                        description: The total number of pages available.
+                        example: 3
+                      total_count:
+                        type: integer
+                        description: The total number of transactions available.
+                        example: 29
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+        "400":
+          description: Bad request - Invalid parameters or missing data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid query parameters"
+  /transactions/history/{id}:
+    get:
+      tags:
+        - Transactions
+      summary: Retrieve specific transaction detail
+      description: Retrieves detailed information of a specific transaction by its ID.
+      security:
+        - DirectTokenAuth: []  # Requires Authorization token
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the transaction to retrieve.
+          schema:
+            type: integer
+            example: 4
+        - name: Authorization
+          in: header
+          required: true
+          description: The Authorization token (without "Bearer" prefix).
+          schema:
+            type: string
+            example: eyJ1c2VyX2lkIjoxLCJleHAiOjE3MjgwNjA4NDEsIm5vbmNlIjoiOTJkNzYyOWY3ZjllY2FhNTY3ZDkzNDA1NzY2NTkyYmUxZmEyNDBkZTgwYjJmNGY5Y2JkY2Y3ZGVkNWE3MmVlNiJ9.62035772193fea6f871672d6944512ce56f49cbab273286f4759b85403b3e311
+      responses:
+        "200":
+          description: Successfully retrieved the transaction detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Transaction detail Found"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: The ID of the transaction.
+                        example: 4
+                      amount:
+                        type: string
+                        description: The amount of the transaction.
+                        example: "100.0"
+                      transaction_type:
+                        type: string
+                        description: The type of the transaction (credit/debit).
+                        example: "credit"
+                      source_wallet_id:
+                        type: integer
+                        description: The ID of the source wallet.
+                        nullable: true
+                        example: null
+                      target_wallet_id:
+                        type: integer
+                        description: The ID of the target wallet.
+                        example: 6
+                      target_wallet_owner_name:
+                        type: string
+                        description: The name of the target wallet owner.
+                        nullable: true
+                        example: null
+                      target_wallet_owner_email:
+                        type: string
+                        description: The email of the target wallet owner.
+                        nullable: true
+                        example: null
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: The timestamp when the transaction was created.
+                        example: "2024-10-02T15:13:02.045Z"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+        "404":
+          description: Transaction not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Transaction not found"
+  /stock/price/all:
+    get:
+      tags:
+        - Stock
+      summary: Retrieve all stock prices
+      description: Retrieves detailed information of all stock prices.
+      responses:
+        "200":
+          description: Successfully retrieved all stock prices.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "All stock prices retrieved"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                          description: The stock symbol.
+                          example: "NIFTY 50"
+                        identifier:
+                          type: string
+                          description: The stock identifier.
+                          example: "NIFTY 50"
+                        change:
+                          type: number
+                          description: Change in stock price.
+                          example: 27.25
+                        day_high:
+                          type: number
+                          description: Day's high price.
+                          example: 25445.7
+                        day_low:
+                          type: number
+                          description: Day's low price.
+                          example: 25336.2
+                        last_price:
+                          type: number
+                          description: The last traded price.
+                          example: 25383.75
+                        last_update_time:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the last price update.
+                          example: "2024-09-16T16:00:00.000+07:00"
+                        open_price:
+                          type: number
+                          description: The opening price.
+                          example: 25406.65
+                        p_change:
+                          type: number
+                          description: Percentage change.
+                          example: 0.11
+                        per_change_30d:
+                          type: number
+                          description: Percentage change over 30 days.
+                          example: 2.1
+                        per_change_365d:
+                          type: number
+                          description: Percentage change over 365 days.
+                          example: 29.85
+                        previous_close:
+                          type: number
+                          description: The previous closing price.
+                          example: 25356.5
+                        total_traded_value:
+                          type: number
+                          description: The total value of traded stocks.
+                          example: 187049240982.16
+                        total_traded_volume:
+                          type: number
+                          description: The total volume of traded stocks.
+                          example: 168694880
+                        year_high:
+                          type: number
+                          description: The highest price of the year.
+                          example: 25445.7
+                        year_low:
+                          type: number
+                          description: The lowest price of the year.
+                          example: 18837.85
+                        meta:
+                          type: object
+                          properties:
+                            company_name:
+                              type: string
+                              description: The name of the company (nullable).
+                              example: "Bajaj Finance Limited"
+                            industry:
+                              type: string
+                              description: The industry of the company (nullable).
+                              example: "Non Banking Financial Company (NBFC)"
+                            isin:
+                              type: string
+                              description: The International Securities Identification Number (ISIN) (nullable).
+                              example: "INE296A13011"
+        "400":
+          description: Bad request - Invalid parameters or missing data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid query parameters"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+  /stock/price/{symbol}:
+    get:
+      tags:
+        - Stock
+      summary: Retrieve stock price by symbol
+      description: Retrieves detailed information of a specific stock by its symbol.
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: The stock symbol to retrieve.
+          schema:
+            type: string
+            example: "NIFTY 50"
+      responses:
+        "200":
+          description: Successfully retrieved stock price.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Stock Found"
+                  data:
+                    type: object
+                    properties:
+                      symbol:
+                        type: string
+                        description: The stock symbol.
+                        example: "NIFTY 50"
+                      identifier:
+                        type: string
+                        description: The stock identifier.
+                        example: "NIFTY 50"
+                      change:
+                        type: number
+                        description: Change in stock price.
+                        example: 27.25
+                      day_high:
+                        type: number
+                        description: Day's high price.
+                        example: 25445.7
+                      day_low:
+                        type: number
+                        description: Day's low price.
+                        example: 25336.2
+                      last_price:
+                        type: number
+                        description: The last traded price.
+                        example: 25383.75
+                      last_update_time:
+                        type: string
+                        format: date-time
+                        description: The timestamp of the last price update.
+                        example: "2024-09-16T16:00:00.000+07:00"
+                      open_price:
+                        type: number
+                        description: The opening price.
+                        example: 25406.65
+                      p_change:
+                        type: number
+                        description: Percentage change.
+                        example: 0.11
+                      per_change_30d:
+                        type: number
+                        description: Percentage change over 30 days.
+                        example: 2.1
+                      per_change_365d:
+                        type: number
+                        description: Percentage change over 365 days.
+                        example: 29.85
+                      previous_close:
+                        type: number
+                        description: The previous closing price.
+                        example: 25356.5
+                      total_traded_value:
+                        type: number
+                        description: The total value of traded stocks.
+                        example: 187049240982.16
+                      total_traded_volume:
+                        type: number
+                        description: The total volume of traded stocks.
+                        example: 168694880
+                      year_high:
+                        type: number
+                        description: The highest price of the year.
+                        example: 25445.7
+                      year_low:
+                        type: number
+                        description: The lowest price of the year.
+                        example: 18837.85
+                      meta:
+                        type: object
+                        properties:
+                          company_name:
+                            type: string
+                            description: The name of the company (nullable).
+                            example: null
+                          industry:
+                            type: string
+                            description: The industry of the company (nullable).
+                            example: null
+                          isin:
+                            type: string
+                            description: The International Securities Identification Number (ISIN) (nullable).
+                            example: null
+        "400":
+          description: Bad request - Invalid symbol or missing data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid stock symbol"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+        "404":
+          description: Stock not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Stock not found"
+  /stock/prices/{symbols}:
+    get:
+      tags:
+        - Stock
+      summary: Retrieve multiple stock prices by symbols
+      description: Retrieves detailed information of multiple stocks by their symbols, provided as a comma-separated string.
+      parameters:
+        - name: symbols
+          in: path
+          required: true
+          description: Comma-separated list of stock symbols to retrieve.
+          schema:
+            type: string
+            example: "NIFTY 50,BAJFINANCE"
+      responses:
+        "200":
+          description: Successfully retrieved matching stock prices.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "ok"
+                  message:
+                    type: string
+                    description: Success message.
+                    example: "Matching stocks found"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                          description: The stock symbol.
+                          example: "NIFTY 50"
+                        identifier:
+                          type: string
+                          description: The stock identifier.
+                          example: "NIFTY 50"
+                        change:
+                          type: number
+                          description: Change in stock price.
+                          example: 27.25
+                        day_high:
+                          type: number
+                          description: Day's high price.
+                          example: 25445.7
+                        day_low:
+                          type: number
+                          description: Day's low price.
+                          example: 25336.2
+                        last_price:
+                          type: number
+                          description: The last traded price.
+                          example: 25383.75
+                        last_update_time:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the last price update.
+                          example: "2024-09-16T16:00:00.000+07:00"
+                        open_price:
+                          type: number
+                          description: The opening price.
+                          example: 25406.65
+                        p_change:
+                          type: number
+                          description: Percentage change.
+                          example: 0.11
+                        per_change_30d:
+                          type: number
+                          description: Percentage change over 30 days.
+                          example: 2.1
+                        per_change_365d:
+                          type: number
+                          description: Percentage change over 365 days.
+                          example: 29.85
+                        previous_close:
+                          type: number
+                          description: The previous closing price.
+                          example: 25356.5
+                        total_traded_value:
+                          type: number
+                          description: The total value of traded stocks.
+                          example: 187049240982.16
+                        total_traded_volume:
+                          type: number
+                          description: The total volume of traded stocks.
+                          example: 168694880
+                        year_high:
+                          type: number
+                          description: The highest price of the year.
+                          example: 25445.7
+                        year_low:
+                          type: number
+                          description: The lowest price of the year.
+                          example: 18837.85
+                        meta:
+                          type: object
+                          properties:
+                            company_name:
+                              type: string
+                              description: The name of the company.
+                              nullable: true
+                              example: "Bajaj Finance Limited"
+                            industry:
+                              type: string
+                              description: The industry of the company.
+                              nullable: true
+                              example: "Non Banking Financial Company (NBFC)"
+                            isin:
+                              type: string
+                              description: The International Securities Identification Number (ISIN).
+                              nullable: true
+                              example: "INE296A13011"
+        "400":
+          description: Bad request - Invalid symbols or missing data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid stock symbols"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Invalid or missing token"
+        "404":
+          description: Stocks not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: The status of the request.
+                    example: "error"
+                  message:
+                    type: string
+                    description: Error message.
+                    example: "Stocks not found"

@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  # Mount Swagger UI for browsing the documentation
+  mount Rswag::Ui::Engine => '/api-docs'
+
+  # Serve the static swagger.yaml file located in public/swagger/v1
+  get '/api-docs/v1/swagger.yaml', to: redirect('/swagger/v1/swagger.yaml')
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -24,5 +30,4 @@ Rails.application.routes.draw do
 
   # wallet routes
   get '/wallet/balances', to: 'wallet#balances'
-
 end
