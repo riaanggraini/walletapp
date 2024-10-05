@@ -86,7 +86,6 @@ paths:
                     type: string
                     description: Error message
                     example: "Invalid email or password"
-  
   /wallet/balances:
     get:
       tags:
@@ -169,7 +168,6 @@ paths:
                     type: string
                     description: Error message.
                     example: "Invalid or missing token"
-  
   /transaction/create:
     post:
       tags:
