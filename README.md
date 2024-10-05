@@ -45,22 +45,27 @@ Make sure you have the following installed:
    ```bash
    git clone https://github.com/your_username/project_name.git
    cd project_name
+2. To copy .env.example and create a new .env file, follow these steps:
+- Copy the .env.example to a new .env file: Run the following command in your terminal:
 
-2. To install the necessary dependencies, run:
+   ```bash
+   cp .env.example .env
+- Edit the .env file: Open the .env file in your preferred text editor and modify the environment variables as needed.
+3. To install the necessary dependencies, run:
 
     ```bash
     bundle install
-3. Set up the database, include seedings:
+4. Set up the database, include seedings:
 
      ```bash
     rails db:create
     rails db:migrate
     rails db:seed
-4. Start the Rails server:
+5. Start the Rails server:
 
     ```bash
     rails server
-5. Visit http://localhost:3000 in your browser.
+6. Visit http://localhost:3000 in your browser.
 
 ## Authentication
 - Login: The app uses a custom authentication system. Users can log in by sending a POST request to the /login endpoint.
